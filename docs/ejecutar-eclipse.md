@@ -47,4 +47,4 @@ En la misma configuración de ejecución, pestaña Arguments → VM arguments, p
 --module-path /home/ojmn/.m2/repository/org/openjfx/javafx-base/21.0.2/javafx-base-21.0.2-linux.jar:/home/ojmn/.m2/repository/org/openjfx/javafx-graphics/21.0.2/javafx-graphics-21.0.2-linux.jar:/home/ojmn/.m2/repository/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2-linux.jar:/home/ojmn/.m2/repository/org/openjfx/javafx-swing/21.0.2/javafx-swing-21.0.2-linux.jar --add-modules javafx.controls,javafx.swing
 ```
 
-En Windows el sufijo de esos JAR es `-win`, no `-linux`.
+En Windows el separador del `--module-path` es `;` y el sufijo de esos JAR es `-win`. La ruta sale de `%USERPROFILE%\.m2\repository\org\openjfx\`. El lanzador del proyecto usa el entorno JavaSE-21, no el nombre del JDK de Linux.

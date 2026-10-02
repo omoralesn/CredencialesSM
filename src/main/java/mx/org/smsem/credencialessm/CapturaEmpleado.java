@@ -7,6 +7,8 @@ import mx.gob.sidi.desk.devices.TopazSerialPad;
 import mx.gob.sidi.desk.devices.WebcamSupport;
 import javafx.stage.Stage;
 
+import java.util.Locale;
+
 /**
  * Fotografía de la cámara y firma del pad. Sin imagen de respaldo.
  */
@@ -17,7 +19,7 @@ public final class CapturaEmpleado {
 
     public static byte[] foto(Stage stage) {
         if (!camaraDisponible()) {
-            throw new IllegalStateException("No hay cámara conectada.");
+            throw new IllegalStateException(mensajeSinCamara());
         }
         return CameraCaptureDialog.show(stage).orElse(null);
     }
@@ -35,6 +37,15 @@ public final class CapturaEmpleado {
         } catch (Exception | UnsatisfiedLinkError ex) {
             return false;
         }
+    }
+
+    private static String mensajeSinCamara() {
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+        if (os.contains("win")) {
+            return "No hay cámara disponible. En Windows revise Privacidad y seguridad → Cámara "
+                    + "y permita el acceso a las aplicaciones de escritorio.";
+        }
+        return "No hay cámara conectada.";
     }
 
     private static boolean padDisponible() {

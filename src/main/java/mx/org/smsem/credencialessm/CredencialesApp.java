@@ -72,6 +72,10 @@ public class CredencialesApp extends Application {
         registro = panelRegistro();
         velo = veloModal();
         stage.setTitle("CredencialesSM");
+        var icono = CredencialesApp.class.getResource("/credencialessm/icono.png");
+        if (icono != null) {
+            stage.getIcons().add(new Image(icono.toExternalForm()));
+        }
         mostrarLogin();
         stage.show();
     }
