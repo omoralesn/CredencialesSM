@@ -11,23 +11,33 @@ El error «faltan los componentes de JavaFX runtime» aparece si Eclipse lanza `
 3. Clic derecho en **credencialessm** → Maven → Update Project.
 4. El JDK del proyecto debe ser Java 21. En esta máquina: `/home/ojmn/programas/java/amazon-corretto-21.0.12.8.1-linux-x64`.
 
-El ingreso de prueba es `operador` / `operador123`. No usa la base: el padrón del Excel queda en memoria y la impresión guarda ids simulados de foto y firma. Para conectar a SMSEM cuando haya base, define `CREDENCIALES_MOCK=false`.
+El script carga el padrón en `TE_PERSONALSMSEM` y el usuario `operador` / `operador123` con perfil `CRDEMP`. Las consultas, altas y el seguimiento salen de esa tabla. La fotografía se toma con la cámara y la firma con el pad Topaz (SignatureGem 1X5-HID, USB `06a8:0043`).
+
+En Linux el nodo `/dev/hidraw*` del pad queda de root. Sin permiso de lectura y escritura la estación lo ve conectado y no lo abre. Una vez, con la contraseña:
+
+```
+/home/ojmn/EspaciosTrabajo/Eclipse/sidid/scripts/setup-topaz.sh
+```
+
+Después desconecta el pad 10 segundos y vuelve a conectarlo.
 
 ## Ejecutar
 
 1. Abrir `CredencialesMain.java`.
 2. Clic derecho → Run As → Java Application.
-3. En Run → Run Configurations → CredencialesMain → Environment, agregar:
+
+La dirección del servidor, el token, el modo de impresora y el resto de valores de la estación están en `src/main/resources/credencialessm/constantes.properties`. Ahí se cambian una sola vez.
+
+`impresora.modo=preview` guarda un PNG de la credencial. En la estación Windows, con la Zebra, usar `zxp7`.
+
+SMSEM debe estar levantado contra la base de desarrollo y la tabla `TE_PERSONALSMSEM` creada con `CredencialesSM/sql/TE_PERSONALSMSEM.sql`.
+
+La foto y la firma se guardan en MongoDB. En esta máquina el contenedor es `smsem-mongo` (`mongo:4.4`) en el puerto `27018`, porque el `27017` ya lo usa otro proyecto. Cómo levantarlo está en `SMSEM/docs/mongo-docker.md`. En `/opt/documents2/properties/propertiesSMSEM.properties` la conexión debe quedar así:
 
 ```
-CREDENCIALES_SMSEM_URL=http://localhost:8080/SMSEM
-CREDENCIALES_TOKEN=estacion-credenciales-smsem
-SIDI_PRINTER=preview
+servidor.SMSEM=mongodb://127.0.0.1:27018
+base.SMSEM=test
 ```
-
-`SIDI_PRINTER=preview` guarda un PNG de la credencial. En la estación Windows, con la Zebra, usar `zxp7`.
-
-El ingreso es `operador` / `operador123` mientras `CREDENCIALES_MOCK` no sea `false`. Con la base disponible, pon `CREDENCIALES_MOCK=false` y usa un usuario de `TE_USUARIOS` con perfil `CRDEMP`. SMSEM debe estar levantado y la tabla `TE_PERSONALSMSEM` creada con `SMSEM/sql/TE_PERSONALSMSEM.sql`.
 
 ## Si Eclipse sigue sin ver JavaFX
 

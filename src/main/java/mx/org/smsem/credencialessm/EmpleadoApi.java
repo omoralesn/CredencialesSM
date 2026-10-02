@@ -16,15 +16,7 @@ public interface EmpleadoApi {
 
     List<EmpleadoSmsem> seguimiento() throws Exception;
 
-    int cuenta() throws Exception;
-
-    int cargarPadron(String contenidoTsv) throws Exception;
-
     static EmpleadoApi crear() {
-        String modo = System.getenv().getOrDefault("CREDENCIALES_MOCK", "true");
-        if ("false".equalsIgnoreCase(modo) || "0".equals(modo)) {
-            return new SmsemEmpleadoClient();
-        }
-        return new MockEmpleadoClient();
+        return new SmsemEmpleadoClient();
     }
 }

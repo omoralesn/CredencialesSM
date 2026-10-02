@@ -26,22 +26,23 @@ public final class EmpleadoPrinter {
     }
 
     public PrintResult imprimir(EmpleadoSmsem empleado, byte[] foto, byte[] firma, boolean aArchivo) throws Exception {
-        BufferedImage face = composer.compose(empleado, foto, firma);
+        BufferedImage hoja = composer.compose(empleado, foto, firma);
         String safe = empleado.claveInterna == null ? "job" : empleado.claveInterna.replaceAll("[^a-zA-Z0-9_-]", "");
-        Path out = dataDir.resolve("print-preview").resolve(
+        Path out = dataDir.resolve(ConstantesEstacion.texto("impresora.carpeta")).resolve(
                 "empleado-" + FILE_TS.format(Instant.now()) + "-" + safe + ".png");
         Files.createDirectories(out.getParent());
-        ImageIO.write(face, "png", out.toFile());
+        ImageIO.write(hoja, "png", out.toFile());
         if (aArchivo) {
             return PrintResult.ok("Credencial guardada en archivo", out);
         }
-        String modo = System.getenv().getOrDefault("SIDI_PRINTER", "zxp7").trim().toLowerCase(Locale.ROOT);
-        if ("preview".equals(modo) || "mock".equals(modo)) {
+        String modo = ConstantesEstacion.texto("impresora.modo").toLowerCase(Locale.ROOT);
+        if ("preview".equals(modo)) {
             return PrintResult.ok("Vista previa generada (sin impresora física)", out);
         }
+        BufferedImage frente = hoja.getSubimage(0, 0, EmpleadoCardComposer.ANCHO, EmpleadoCardComposer.ALTO);
         CredentialPrintJob job = new CredentialPrintJob(
                 safe, safe, safe, "", empleado.clave, empleado.nombreCompleto, "",
                 "EMPLEADO", null, null);
-        return new ZxpSeries7Printer(dataDir).printPreparedFace(face, job);
+        return new ZxpSeries7Printer(dataDir).printPreparedFace(frente, job);
     }
 }

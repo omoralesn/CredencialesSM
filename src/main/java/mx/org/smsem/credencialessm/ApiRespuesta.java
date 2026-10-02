@@ -10,8 +10,6 @@ public class ApiRespuesta {
     public boolean ok;
     public String mensaje;
     public String nombre;
-    public int total;
-    public int insertados;
     public EmpleadoSmsem persona;
     public List<EmpleadoSmsem> personas;
 }

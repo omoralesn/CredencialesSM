@@ -1,0 +1,160 @@
+/* Identidad SMSEM: azul del mapa, oro del escudo, verde de la bandera. */
+
+.root {
+    -fx-background-color: #f7f4ea;
+}
+
+.title {
+    -fx-text-fill: #003b7a;
+}
+
+.subtitle,
+.muted {
+    -fx-text-fill: #3d5a40;
+}
+
+.nav-bar {
+    -fx-background-color: #003b7a;
+    -fx-border-color: #e2b007;
+    -fx-border-width: 0 0 4 0;
+}
+
+.btn-primary {
+    -fx-background-color: #003b7a;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #00509a;
+}
+
+.btn-secondary {
+    -fx-background-color: #fff8e1;
+    -fx-text-fill: #003b7a;
+    -fx-border-color: #e2b007;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #ffe8a3;
+}
+
+.btn-menu {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d6e4f5;
+    -fx-font-size: 14px;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.btn-menu:hover {
+    -fx-text-fill: white;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-menu-activo {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-color: #e2b007;
+    -fx-border-width: 0 0 3 0;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.velo {
+    -fx-background-color: rgba(0, 30, 60, 0.45);
+}
+
+.velo-caja {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 28 40 28 40;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 59, 122, 0.35), 18, 0.2, 0, 4);
+}
+
+.velo-texto {
+    -fx-text-fill: #003b7a;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.btn-ayuda {
+    -fx-background-color: #003b7a;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 18;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-ayuda:hover {
+    -fx-background-color: #00509a;
+}
+
+.btn-danger {
+    -fx-background-color: #c41230;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #9e0e26;
+}
+
+.status-bar {
+    -fx-background-color: #fff8e1;
+    -fx-text-fill: #003b7a;
+}
+
+.status-busy {
+    -fx-background-color: #e7eef8;
+    -fx-text-fill: #003b7a;
+}
+
+.status-ok {
+    -fx-background-color: #e5f6ec;
+    -fx-text-fill: #086b36;
+}
+
+.status-err,
+.login-error {
+    -fx-text-fill: #c41230;
+}
+
+.status-err {
+    -fx-background-color: #fde8ea;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #003b7a;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: #003b7a;
+    -fx-size: 28;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #e7eef8;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: #e2b007;
+    -fx-background-insets: 0;
+}
