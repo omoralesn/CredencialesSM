@@ -5,7 +5,7 @@
 #
 # El programa queda en target\credencialessm-windows\CredencialesSM\CredencialesSM.exe
 # Si WiX 3 está instalado (candle.exe), también arma el instalador .exe.
-# Desde Linux no sale un .exe: ahí se lanza con  mvn javafx:run
+# Desde Linux no sale un .exe: ahí se lanza con  java -jar target/credencialessm-1.0.0-SNAPSHOT.jar
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
@@ -35,19 +35,7 @@ if (Test-Path $Entrada) {
 }
 New-Item -ItemType Directory -Path $Entrada | Out-Null
 
-mvn -q dependency:copy-dependencies "-DincludeScope=runtime" "-DoutputDirectory=$Entrada"
 Copy-Item $Jar $Entrada
-Copy-Item (Join-Path $Root "lib\sidid.jar") $Entrada
-
-Get-ChildItem $Entrada -Filter "javafx-*.jar" | ForEach-Object {
-    if ($_.Name -match "-win\.jar$") {
-        return
-    }
-    $conNativo = Join-Path $Entrada ($_.Name -replace "\.jar$", "-win.jar")
-    if (Test-Path $conNativo) {
-        Remove-Item $_.FullName
-    }
-}
 
 $Destino = Join-Path $Root "target\credencialessm-windows"
 if (Test-Path $Destino) {
