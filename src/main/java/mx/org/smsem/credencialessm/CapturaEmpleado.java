@@ -1,13 +1,13 @@
 package mx.org.smsem.credencialessm;
 
+import java.util.Locale;
+
+import javafx.stage.Stage;
 import mx.gob.sidi.desk.app.ui.CameraCaptureDialog;
 import mx.gob.sidi.desk.app.ui.SignatureCaptureDialog;
 import mx.gob.sidi.desk.devices.TopazHidPad;
 import mx.gob.sidi.desk.devices.TopazSerialPad;
 import mx.gob.sidi.desk.devices.WebcamSupport;
-import javafx.stage.Stage;
-
-import java.util.Locale;
 
 /**
  * Fotografía de la cámara y firma del pad. Sin imagen de respaldo.

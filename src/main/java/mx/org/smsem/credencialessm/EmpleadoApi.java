@@ -12,7 +12,8 @@ public interface EmpleadoApi {
 
     EmpleadoSmsem modifica(String claveInterna, String clave, String nombre, String adscripcion) throws Exception;
 
-    EmpleadoSmsem imprimir(String claveInterna, byte[] foto, byte[] firma, String usuario) throws Exception;
+    EmpleadoSmsem imprimir(String claveInterna, byte[] foto, byte[] firma, String usuario, boolean impresionFisica)
+            throws Exception;
 
     List<EmpleadoSmsem> seguimiento() throws Exception;
 

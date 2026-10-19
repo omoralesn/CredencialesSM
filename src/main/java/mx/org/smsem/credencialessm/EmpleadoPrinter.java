@@ -45,4 +45,13 @@ public final class EmpleadoPrinter {
                 "EMPLEADO", null, null);
         return new ZxpSeries7Printer(dataDir).printPreparedFace(frente, job);
     }
+
+    /** True solo si va a impresora física (no checkbox archivo ni modo preview). */
+    public static boolean esImpresionFisica(boolean aArchivo) {
+        if (aArchivo) {
+            return false;
+        }
+        String modo = ConstantesEstacion.texto("impresora.modo").toLowerCase(Locale.ROOT);
+        return !"preview".equals(modo);
+    }
 }

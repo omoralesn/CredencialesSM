@@ -16,8 +16,14 @@ public class EmpleadoSmsem {
     public String fechaCaptura;
     public String fechaImpresion;
     public String usuarioEstacion;
+    public Integer numReimpresiones;
+    public String fechaReimpresion;
 
     public boolean impresa() {
         return fechaImpresion != null && !fechaImpresion.isBlank();
+    }
+
+    public int reimpresiones() {
+        return numReimpresiones == null ? 0 : numReimpresiones;
     }
 }

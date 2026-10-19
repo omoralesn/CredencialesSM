@@ -135,12 +135,40 @@ public final class EmpleadoCardComposer {
         if (imagen == null) {
             return;
         }
+        imagen = firmaFondoTransparente(imagen);
         double escala = Math.min(w / (double) imagen.getWidth(), h / (double) imagen.getHeight());
         int ancho = (int) Math.round(imagen.getWidth() * escala);
         int alto = (int) Math.round(imagen.getHeight() * escala);
         int origenX = x + (w - ancho) / 2;
         int origenY = y + (h - alto) / 2;
         g.drawImage(imagen, origenX, origenY, ancho, alto, null);
+    }
+
+    /**
+     * El pad entrega PNG con fondo blanco. Convierte el blanco (y casi blanco) a
+     * alpha para que se vea el boceto debajo de la firma.
+     */
+    private static BufferedImage firmaFondoTransparente(BufferedImage origen) {
+        int ancho = origen.getWidth();
+        int alto = origen.getHeight();
+        BufferedImage salida = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < alto; y++) {
+            for (int x = 0; x < ancho; x++) {
+                int argb = origen.getRGB(x, y);
+                int alphaOrigen = (argb >>> 24) & 0xFF;
+                int r = (argb >>> 16) & 0xFF;
+                int g = (argb >>> 8) & 0xFF;
+                int b = argb & 0xFF;
+                int luma = (r * 30 + g * 59 + b * 11) / 100;
+                int alpha = Math.min(alphaOrigen, 255 - luma);
+                if (alpha < 12) {
+                    salida.setRGB(x, y, 0);
+                } else {
+                    salida.setRGB(x, y, (alpha << 24) | (r << 16) | (g << 8) | b);
+                }
+            }
+        }
+        return salida;
     }
 
     private static BufferedImage qr(String cadena, int tamano) throws Exception {

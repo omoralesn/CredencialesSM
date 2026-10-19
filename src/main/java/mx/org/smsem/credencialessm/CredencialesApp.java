@@ -35,7 +35,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -287,15 +292,17 @@ public class CredencialesApp extends Application {
                 if (!resultado.isAccepted()) {
                     throw new IllegalStateException(resultado.getMessage());
                 }
-                EmpleadoSmsem impresa = cliente.imprimir(persona.claveInterna, foto, firma, operador);
+                boolean fisica = EmpleadoPrinter.esImpresionFisica(aArchivo);
+                EmpleadoSmsem impresa = cliente.imprimir(persona.claveInterna, foto, firma, operador, fisica);
                 String destino = resultado.getArtifactPath() == null
                         ? "impresora"
                         : resultado.getArtifactPath().toString();
-                return (aArchivo ? "Guardada en archivo: " : "Enviada a impresora. ")
+                return (aArchivo ? "Guardada en archivo: " : (fisica ? "Enviada a impresora. " : "Vista previa. "))
                         + destino
                         + " · foto de cámara · firma del pad · "
                         + impresa.idMongoFoto
-                        + " · " + impresa.idMongoFirma;
+                        + " · " + impresa.idMongoFirma
+                        + (fisica ? " · reimps. físicas: " + impresa.reimpresiones() : "");
             }, texto -> estadoOk(estado, texto), fallo -> estadoError(estado, mensaje(fallo)), botones);
         } catch (Exception ex) {
             String texto = mensaje(ex);
@@ -319,6 +326,11 @@ public class CredencialesApp extends Application {
         return a.equals(b);
     }
 
+    private static final DateTimeFormatter FECHA_SMSEM = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final Comparator<EmpleadoSmsem> POR_IMPRESION_DESC = Comparator
+            .comparingLong(CredencialesApp::epochImpresion).reversed()
+            .thenComparing(e -> nulo(e.nombreCompleto), String.CASE_INSENSITIVE_ORDER);
+
     private void mostrarSeguimiento() {
         seccion = "seguimiento";
         BorderPane raiz = new BorderPane();
@@ -327,18 +339,43 @@ public class CredencialesApp extends Application {
         estado.getStyleClass().setAll("status-bar");
         Indicador indicador = new Indicador();
         int marca = ++vista;
+        TextField filtro = new TextField();
+        filtro.setPromptText("Nombre, clave…");
+        HBox.setHgrow(filtro, Priority.ALWAYS);
         Button actualizar = UiTheme.primaryButton("Actualizar");
-        HBox barra = new HBox(8, actualizar);
+        HBox barra = new HBox(8, filtro, actualizar);
         barra.setPadding(new Insets(12));
+        barra.setAlignment(Pos.CENTER_LEFT);
         TableView<EmpleadoSmsem> tabla = tablaEmpleados();
         TableColumn<EmpleadoSmsem, String> impresa = new TableColumn<>("Impresión");
         impresa.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().impresa() ? c.getValue().fechaImpresion : "Pendiente"));
-        tabla.getColumns().add(impresa);
+        TableColumn<EmpleadoSmsem, String> reimps = new TableColumn<>("Reimps. físicas");
+        reimps.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().reimpresiones())));
+        TableColumn<EmpleadoSmsem, String> fecReimp = new TableColumn<>("Última reimpresión");
+        fecReimp.setCellValueFactory(c -> new SimpleStringProperty(
+                c.getValue().fechaReimpresion == null || c.getValue().fechaReimpresion.isBlank()
+                        ? "—"
+                        : c.getValue().fechaReimpresion));
+        tabla.getColumns().addAll(List.of(impresa, reimps, fecReimp));
+        final List<EmpleadoSmsem>[] todos = new List[]{List.of()};
+        Runnable aplicarFiltro = () -> {
+            String texto = filtro.getText() == null ? "" : filtro.getText().trim();
+            List<EmpleadoSmsem> filas = filtrarSeguimiento(todos[0], texto);
+            tabla.getItems().setAll(filas);
+            estadoOk(estado, filas.size() + (texto.isEmpty() ? " registros en SMSEM" : " coincidencias"));
+        };
+        PauseTransition pausa = new PauseTransition(Duration.millis(ConstantesEstacion.entero("busqueda.esperaMillis")));
+        filtro.textProperty().addListener((o, anterior, texto) -> {
+            pausa.setOnFinished(ev -> aplicarFiltro.run());
+            pausa.playFromStart();
+        });
         Runnable cargar = () -> enCurso(marca, indicador, estado, "Consultando el seguimiento…", "seguimiento", true,
                 () -> cliente.seguimiento(),
                 filas -> {
-                    tabla.getItems().setAll(filas);
-                    estadoOk(estado, filas.size() + " registros en SMSEM");
+                    List<EmpleadoSmsem> ordenadas = new ArrayList<>(filas == null ? List.of() : filas);
+                    ordenadas.sort(POR_IMPRESION_DESC);
+                    todos[0] = ordenadas;
+                    aplicarFiltro.run();
                 },
                 fallo -> estadoError(estado, mensaje(fallo)),
                 actualizar);
@@ -347,6 +384,44 @@ public class CredencialesApp extends Application {
         raiz.setCenter(tabla);
         stage.setScene(escena(raiz, 1100, 680));
         cargar.run();
+    }
+
+    private static List<EmpleadoSmsem> filtrarSeguimiento(List<EmpleadoSmsem> origen, String texto) {
+        List<EmpleadoSmsem> filas = new ArrayList<>(origen == null ? List.of() : origen);
+        if (texto != null && !texto.isBlank()) {
+            String q = texto.toLowerCase(Locale.ROOT);
+            filas.removeIf(persona -> !coincideSeguimiento(persona, q));
+        }
+        filas.sort(POR_IMPRESION_DESC);
+        return filas;
+    }
+
+    private static boolean coincideSeguimiento(EmpleadoSmsem persona, String q) {
+        return contiene(persona.nombreCompleto, q)
+                || contiene(persona.clave, q)
+                || contiene(persona.claveInterna, q)
+                || contiene(persona.adscripcion, q)
+                || contiene(persona.usuarioEstacion, q);
+    }
+
+    private static boolean contiene(String valor, String q) {
+        return valor != null && valor.toLowerCase(Locale.ROOT).contains(q);
+    }
+
+    private static long epochImpresion(EmpleadoSmsem persona) {
+        if (persona == null || persona.fechaImpresion == null || persona.fechaImpresion.isBlank()) {
+            return Long.MIN_VALUE;
+        }
+        String texto = persona.fechaImpresion.trim();
+        try {
+            return LocalDate.parse(texto, FECHA_SMSEM).toEpochDay();
+        } catch (Exception ignored) {
+            try {
+                return Long.parseLong(texto);
+            } catch (Exception ignoredToo) {
+                return Long.MIN_VALUE;
+            }
+        }
     }
 
     private int consultaSerial;

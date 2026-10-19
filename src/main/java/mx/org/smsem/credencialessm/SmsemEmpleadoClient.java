@@ -61,12 +61,14 @@ public final class SmsemEmpleadoClient implements EmpleadoApi {
         return respuesta.persona;
     }
 
-    public EmpleadoSmsem imprimir(String claveInterna, byte[] foto, byte[] firma, String usuario) throws Exception {
+    public EmpleadoSmsem imprimir(String claveInterna, byte[] foto, byte[] firma, String usuario,
+                                  boolean impresionFisica) throws Exception {
         ApiRespuesta respuesta = post(ConstantesEstacion.texto("accion.imprime"),
                 form("claveInterna", claveInterna,
                         "fotoBase64", Base64.getEncoder().encodeToString(foto),
                         "firmaBase64", Base64.getEncoder().encodeToString(firma),
-                        "usuarioEstacion", usuario));
+                        "usuarioEstacion", usuario,
+                        "impresionFisica", impresionFisica ? "true" : "false"));
         return respuesta.persona;
     }
 
