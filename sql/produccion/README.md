@@ -11,7 +11,8 @@ Ejecutar en el esquema SMSEM (p. ej. `SMSEM01`) en este orden, con el usuario du
 | 5 | `05_TE_USUARIOS_operadores.sql` | Operadores de estación (ajustar usuarios/contraseñas) |
 | 6 | `06_caducar_modulo.sql` | Caducar o ampliar vigencia |
 | 7 | `07_TE_PERSONALSMSEM_reimpresion.sql` | Columnas de reimpresión física |
-| 8 | `99_verificar.sql` | Consultas de comprobación |
+| 8 | `08_limpia_ESM000327.sql` | Deja `ESM000327` pendiente de reimpresión |
+| 9 | `99_verificar.sql` | Consultas de comprobación |
 
 El padrón masivo (485 personas) sigue en `../TE_PERSONALSMSEM.sql` si hace falta cargarlo.
 
