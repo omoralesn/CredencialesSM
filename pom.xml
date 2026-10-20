@@ -109,6 +109,18 @@
                                         <exclude name="META-INF/maven/**"/>
                                     </patternset>
                                 </unzip>
+                                <!-- Link-OS PC-Card Java 3.01.211. Licencia de Zebra en lib/zebra. -->
+                                <unzip dest="${project.build.outputDirectory}" overwrite="false">
+                                    <fileset dir="${project.basedir}/lib/zebra" includes="*.jar"/>
+                                    <patternset>
+                                        <exclude name="META-INF/MANIFEST.MF"/>
+                                        <exclude name="META-INF/*.SF"/>
+                                        <exclude name="META-INF/*.DSA"/>
+                                        <exclude name="META-INF/*.RSA"/>
+                                        <exclude name="META-INF/maven/**"/>
+                                        <exclude name="module-info.class"/>
+                                    </patternset>
+                                </unzip>
                             </target>
                         </configuration>
                     </execution>
