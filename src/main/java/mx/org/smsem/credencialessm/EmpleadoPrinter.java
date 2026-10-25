@@ -40,10 +40,21 @@ public final class EmpleadoPrinter {
             return PrintResult.ok("Vista previa generada (sin impresora física)", out);
         }
         BufferedImage frente = hoja.getSubimage(0, 0, EmpleadoCardComposer.ANCHO, EmpleadoCardComposer.ALTO);
-        CredentialPrintJob job = new CredentialPrintJob(
+        int yReverso = hoja.getHeight() - EmpleadoCardComposer.ALTO;
+        BufferedImage reverso = hoja.getSubimage(0, yReverso, EmpleadoCardComposer.ANCHO, EmpleadoCardComposer.ALTO);
+        ZxpSeries7Printer zxp = new ZxpSeries7Printer(dataDir);
+        CredentialPrintJob frenteJob = new CredentialPrintJob(
                 safe, safe, safe, "", empleado.clave, empleado.nombreCompleto, "",
                 "EMPLEADO", null, null);
-        return new ZxpSeries7Printer(dataDir).printPreparedFace(frente, job);
+        PrintResult cara = zxp.printPreparedFace(frente, frenteJob);
+        CredentialPrintJob reversoJob = new CredentialPrintJob(
+                safe + "-R", safe, safe, "", empleado.clave, empleado.nombreCompleto, "",
+                "EMPLEADO", null, null);
+        PrintResult dorso = zxp.printPreparedFace(reverso, reversoJob);
+        if (!dorso.isAccepted()) {
+            return dorso;
+        }
+        return cara;
     }
 
     /** True solo si va a impresora física (no checkbox archivo ni modo preview). */
