@@ -19,6 +19,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21.0.2</javafx.version>
         <javafx.platform>linux</javafx.platform>
+        <!-- El empaquetado deja solo el nativo de este sistema. El otro se quita. -->
+        <opencv.otro.sistema>nu/pattern/opencv/windows/**</opencv.otro.sistema>
+        <serial.otro.sistema>Windows/**</serial.otro.sistema>
+        <hid.otro.sistema>win32-*/**</hid.otro.sistema>
     </properties>
 
     <dependencies>
@@ -135,8 +139,14 @@
                             <target>
                                 <unzip src="${project.basedir}/lib/sidid.jar" dest="${project.build.outputDirectory}" overwrite="true">
                                     <patternset>
-                                        <exclude name="META-INF/MANIFEST.MF"/>
-                                        <exclude name="META-INF/maven/**"/>
+                                        <!-- Cámara, pad, tema y el adaptador ZXP. El resto de sidid no lo usa la estación. -->
+                                        <include name="mx/gob/sidi/desk/devices/**"/>
+                                        <include name="mx/gob/sidi/desk/app/ui/CameraCaptureDialog*.class"/>
+                                        <include name="mx/gob/sidi/desk/app/ui/SignatureCaptureDialog*.class"/>
+                                        <include name="mx/gob/sidi/desk/app/ui/UiTheme.class"/>
+                                        <include name="mx/gob/sidi/desk/app/ui/UiDialogs.class"/>
+                                        <include name="ui/sididesk.css"/>
+                                        <include name="card-layout.properties"/>
                                     </patternset>
                                 </unzip>
                             </target>
@@ -164,6 +174,46 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.openpnp:opencv</artifact>
+                                    <excludes>
+                                        <exclude>nu/pattern/opencv/osx/**</exclude>
+                                        <exclude>nu/pattern/opencv/linux/ARMv7/**</exclude>
+                                        <exclude>nu/pattern/opencv/linux/ARMv8/**</exclude>
+                                        <exclude>nu/pattern/opencv/linux/x86_32/**</exclude>
+                                        <exclude>nu/pattern/opencv/windows/x86_32/**</exclude>
+                                        <exclude>${opencv.otro.sistema}</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fazecast:jSerialComm</artifact>
+                                    <excludes>
+                                        <exclude>OSX/**</exclude>
+                                        <exclude>Solaris/**</exclude>
+                                        <exclude>FreeBSD/**</exclude>
+                                        <exclude>OpenBSD/**</exclude>
+                                        <exclude>Android/**</exclude>
+                                        <exclude>Linux/arm*/**</exclude>
+                                        <exclude>Linux/ppc64le/**</exclude>
+                                        <exclude>Linux/x86/**</exclude>
+                                        <exclude>Windows/x86/**</exclude>
+                                        <exclude>Windows/arm*/**</exclude>
+                                        <exclude>Windows/aarch64/**</exclude>
+                                        <exclude>${serial.otro.sistema}</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.hid4java:hid4java</artifact>
+                                    <excludes>
+                                        <exclude>darwin-*/**</exclude>
+                                        <exclude>linux-arm/**</exclude>
+                                        <exclude>linux-arm*/**</exclude>
+                                        <exclude>linux-aarch64/**</exclude>
+                                        <exclude>linux-riscv64/**</exclude>
+                                        <exclude>linux-x86/**</exclude>
+                                        <exclude>${hid.otro.sistema}</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -198,6 +248,9 @@
             </activation>
             <properties>
                 <javafx.platform>win</javafx.platform>
+                <opencv.otro.sistema>nu/pattern/opencv/linux/**</opencv.otro.sistema>
+                <serial.otro.sistema>Linux/**</serial.otro.sistema>
+                <hid.otro.sistema>linux-*/**</hid.otro.sistema>
             </properties>
         </profile>
         <profile>

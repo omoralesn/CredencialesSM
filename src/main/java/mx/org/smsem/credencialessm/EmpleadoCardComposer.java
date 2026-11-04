@@ -1,7 +1,6 @@
 package mx.org.smsem.credencialessm;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
@@ -21,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Credencial vertical de personal. El frente y el reverso son los bocetos;
@@ -317,17 +315,73 @@ public final class EmpleadoCardComposer {
         return salida;
     }
 
+    /**
+     * No usa {@code EncodeHintType.MARGIN}. El SDK de Zebra incluye zxing 1.7, que no
+     * tiene ese campo: el hilo de impresión moría con NoSuchFieldError y el velo se quedaba.
+     * Se pide la matriz natural y se deja un módulo de margen al dibujarla.
+     */
     private static BufferedImage qr(String cadena, int tamano) throws Exception {
         String payload = cadena == null || cadena.isBlank() ? "SMSEM" : cadena;
-        BitMatrix matrix = new QRCodeWriter().encode(payload, BarcodeFormat.QR_CODE, tamano, tamano,
-                Map.of(EncodeHintType.MARGIN, 1));
+        BitMatrix matrix = new QRCodeWriter().encode(payload, BarcodeFormat.QR_CODE, 0, 0);
+        int[] caja = cajaConMargen(matrix, 1);
+        int origenX = caja[0];
+        int origenY = caja[1];
+        int lado = caja[2];
         BufferedImage imagen = new BufferedImage(tamano, tamano, BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < tamano; y++) {
+            int srcY = origenY + (y * lado) / tamano;
             for (int x = 0; x < tamano; x++) {
-                imagen.setRGB(x, y, matrix.get(x, y) ? 0xFF1A2744 : 0xFFFFFFFF);
+                int srcX = origenX + (x * lado) / tamano;
+                imagen.setRGB(x, y, matrix.get(srcX, srcY) ? 0xFF1A2744 : 0xFFFFFFFF);
             }
         }
         return imagen;
+    }
+
+    /** x, y y lado del QR con el margen pedido, en píxeles de la matriz. */
+    private static int[] cajaConMargen(BitMatrix matrix, int margenModulos) {
+        int ancho = matrix.getWidth();
+        int alto = matrix.getHeight();
+        int minX = ancho;
+        int minY = alto;
+        int maxX = -1;
+        int maxY = -1;
+        for (int y = 0; y < alto; y++) {
+            for (int x = 0; x < ancho; x++) {
+                if (matrix.get(x, y)) {
+                    if (x < minX) {
+                        minX = x;
+                    }
+                    if (y < minY) {
+                        minY = y;
+                    }
+                    if (x > maxX) {
+                        maxX = x;
+                    }
+                    if (y > maxY) {
+                        maxY = y;
+                    }
+                }
+            }
+        }
+        if (maxX < 0) {
+            return new int[] {0, 0, Math.max(ancho, 1)};
+        }
+        int modulo = 1;
+        while (minX + modulo <= maxX && matrix.get(minX + modulo, minY)) {
+            modulo++;
+        }
+        int margen = Math.max(0, margenModulos) * modulo;
+        int x0 = Math.max(0, minX - margen);
+        int y0 = Math.max(0, minY - margen);
+        int lado = Math.max(maxX - minX, maxY - minY) + 1 + margen * 2;
+        if (x0 + lado > ancho) {
+            lado = ancho - x0;
+        }
+        if (y0 + lado > alto) {
+            lado = alto - y0;
+        }
+        return new int[] {x0, y0, Math.max(lado, 1)};
     }
 
     private static BufferedImage leer(byte[] bytes) throws Exception {
