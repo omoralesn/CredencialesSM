@@ -525,9 +525,12 @@ public class CredencialesApp extends Application {
                     }
                     alTerminar.accept(resultado);
                 });
-            } catch (Exception ex) {
-                String texto = mensaje(ex);
-                bitacora.error(operacion, texto, ex);
+            } catch (Throwable ex) {
+                Exception fallo = ex instanceof Exception e
+                        ? e
+                        : new IllegalStateException(ex.toString(), ex);
+                String texto = mensaje(fallo);
+                bitacora.error(operacion, texto, fallo);
                 Platform.runLater(() -> {
                     if (modal) {
                         ocultarVelo();
@@ -538,7 +541,7 @@ public class CredencialesApp extends Application {
                     if (marca != vista) {
                         return;
                     }
-                    alFallar.accept(ex);
+                    alFallar.accept(fallo);
                 });
             }
         }, "credenciales-" + operacion);

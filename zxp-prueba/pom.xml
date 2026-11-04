@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>mx.gob.sidi</groupId>
+    <artifactId>zxp-prueba</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>ZXP prueba</name>
+    <description>Verificador de impresión ZXP. No forma parte del ejecutable de la estación.</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <zebra>${project.basedir}/../lib/zebra</zebra>
+        <usb.nativo>libusb4java-1.3.0-linux-x86-64.jar</usb.nativo>
+        <usb.nativo.archivo>${zebra}/${usb.nativo}</usb.nativo.archivo>
+        <envio.dir>${project.build.directory}/envio</envio.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.zebra</groupId>
+            <artifactId>ZSDK_CARD_API</artifactId>
+            <version>3.01.263</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/ZSDK_CARD_API.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.zebra</groupId>
+            <artifactId>ZSDK_API</artifactId>
+            <version>3.01.263</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/ZSDK_API.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.22.0</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/commons-io-2.22.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.21.0</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/commons-lang3-3.21.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.22.1</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/commons-codec-1.22.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.11.0</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/commons-validator-1.11.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.22.3</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/jackson-databind-2.22.3.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.22.3</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/jackson-core-2.22.3.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.22</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/jackson-annotations-2.22.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.snmp4j</groupId>
+            <artifactId>snmp4j</artifactId>
+            <version>3.13.1</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/snmp4j-3.13.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.zebra</groupId>
+            <artifactId>snmp6_1z</artifactId>
+            <version>1</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/snmp6_1z.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.86</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/bcprov-jdk18on-1.86.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.usb4java</groupId>
+            <artifactId>usb4java</artifactId>
+            <version>1.3.0</version>
+            <scope>system</scope>
+            <systemPath>${zebra}/usb4java-1.3.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.usb4java</groupId>
+            <artifactId>libusb4java</artifactId>
+            <version>1.3.0</version>
+            <classifier>linux-x86-64</classifier>
+            <scope>system</scope>
+            <systemPath>${zebra}/libusb4java-1.3.0-linux-x86-64.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>zxp-prueba</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>21</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>carpeta-para-enviar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${envio.dir}/lib"/>
+                                <mkdir dir="${envio.dir}/natives"/>
+                                <copy todir="${envio.dir}/lib">
+                                    <fileset dir="${zebra}" includes="ZSDK_CARD_API.jar,ZSDK_API.jar,commons-io-2.22.0.jar,commons-lang3-3.21.0.jar,commons-codec-1.22.1.jar,commons-validator-1.11.0.jar,jackson-databind-2.22.3.jar,jackson-core-2.22.3.jar,jackson-annotations-2.22.jar,snmp4j-3.13.1.jar,snmp6_1z.jar,bcprov-jdk18on-1.86.jar,usb4java-1.3.0.jar"/>
+                                </copy>
+                                <copy file="${usb.nativo.archivo}" tofile="${envio.dir}/lib/${usb.nativo}"/>
+                                <copy file="${zebra}/ZebraNativeUsbAdapter_64.dll" todir="${envio.dir}/natives"/>
+                                <copy todir="${envio.dir}">
+                                    <fileset dir="${project.basedir}/lanzador" includes="zxp-prueba.bat,zxp-prueba.sh"/>
+                                </copy>
+                                <jar destfile="${envio.dir}/zxp-prueba.jar" basedir="${project.build.outputDirectory}">
+                                    <manifest>
+                                        <attribute name="Main-Class" value="mx.org.smsem.credencialessm.zxp.ZxpPrueba"/>
+                                        <attribute name="Class-Path" value="lib/ZSDK_CARD_API.jar lib/ZSDK_API.jar lib/commons-io-2.22.0.jar lib/commons-lang3-3.21.0.jar lib/commons-codec-1.22.1.jar lib/commons-validator-1.11.0.jar lib/jackson-databind-2.22.3.jar lib/jackson-core-2.22.3.jar lib/jackson-annotations-2.22.jar lib/snmp4j-3.13.1.jar lib/snmp6_1z.jar lib/bcprov-jdk18on-1.86.jar lib/usb4java-1.3.0.jar lib/${usb.nativo}"/>
+                                    </manifest>
+                                </jar>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <properties>
+                <usb.nativo>libusb4java-1.3.0-win32-x86-64.jar</usb.nativo>
+                <usb.nativo.archivo>${settings.localRepository}/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-win32-x86-64.jar</usb.nativo.archivo>
+                <envio.dir>${project.build.directory}/envio-windows</envio.dir>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.usb4java</groupId>
+                    <artifactId>libusb4java</artifactId>
+                    <version>1.3.0</version>
+                    <classifier>win32-x86-64</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
