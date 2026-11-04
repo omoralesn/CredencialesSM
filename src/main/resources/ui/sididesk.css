@@ -1,0 +1,347 @@
+/* SIDIDesk — estilos institucionales */
+
+.root {
+    -fx-font-family: "Segoe UI", "Ubuntu", "Noto Sans", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #f5f7fa;
+}
+
+.title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+.subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #486581;
+}
+
+.muted {
+    -fx-text-fill: #627d98;
+    -fx-font-size: 12px;
+}
+
+.nav-bar {
+    -fx-background-color: #1f3a5f;
+    -fx-padding: 12 16 12 16;
+}
+
+.nav-title {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.nav-meta {
+    -fx-text-fill: #d9e2ec;
+    -fx-font-size: 12px;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(16,42,67,0.12), 12, 0.2, 0, 3);
+    -fx-padding: 20;
+}
+
+.btn-primary {
+    -fx-background-color: #243b53;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #334e68;
+}
+
+.btn-primary:disabled {
+    -fx-background-color: #9fb3c8;
+}
+
+.btn-secondary {
+    -fx-background-color: #d9e2ec;
+    -fx-text-fill: #102a43;
+    -fx-background-radius: 6;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #bcccdc;
+}
+
+.btn-danger {
+    -fx-background-color: #9b1c1c;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+}
+
+.badge {
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.badge-ok {
+    -fx-background-color: #dcffe4;
+    -fx-text-fill: #0f7b3a;
+}
+
+.badge-warn {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #b36b00;
+}
+
+.badge-err {
+    -fx-background-color: #fde8e8;
+    -fx-text-fill: #9b1c1c;
+}
+
+.badge-info {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #0b6e99;
+}
+
+.badge-muted {
+    -fx-background-color: #e4e7eb;
+    -fx-text-fill: #486581;
+}
+
+.section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+.step-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #627d98;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d9e2ec;
+    -fx-border-radius: 6;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #e4eaf1;
+}
+
+.text-field, .password-field {
+    -fx-pref-height: 34px;
+    -fx-background-radius: 6;
+}
+
+.toolbar-group {
+    -fx-spacing: 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.preview-frame {
+    -fx-border-color: #bcccdc;
+    -fx-border-radius: 8;
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+}
+
+.status-bar {
+    -fx-padding: 8 16 8 16;
+    -fx-font-size: 12px;
+    -fx-background-color: #e4eaf1;
+    -fx-text-fill: #102a43;
+}
+
+.status-busy {
+    -fx-background-color: #d9e2ec;
+    -fx-text-fill: #243b53;
+    -fx-font-weight: bold;
+}
+
+.status-ok {
+    -fx-background-color: #dcffe4;
+    -fx-text-fill: #0f7b3a;
+}
+
+.status-warn {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #b36b00;
+}
+
+.status-err {
+    -fx-background-color: #fde8e8;
+    -fx-text-fill: #9b1c1c;
+}
+
+.status-info {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #0b6e99;
+}
+
+.cred-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1f3a5f 0%, #243b53 55%, #334e68 100%);
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(16,42,67,0.28), 16, 0.25, 0, 4);
+    -fx-padding: 16;
+}
+
+.cred-brand {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.cred-tipo {
+    -fx-text-fill: #d9e2ec;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8 3 8;
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-radius: 8;
+}
+
+.cred-name {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.cred-line {
+    -fx-text-fill: #d9e2ec;
+    -fx-font-size: 12px;
+}
+
+.cred-photo-slot {
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(255,255,255,0.35);
+    -fx-border-radius: 6;
+    -fx-alignment: CENTER;
+}
+
+.cred-sign-slot {
+    -fx-background-color: rgba(255,255,255,0.92);
+    -fx-background-radius: 6;
+    -fx-padding: 4 8 4 8;
+}
+
+/* —— Login (contenido plano, sin marcos) —— */
+.login-error {
+    -fx-text-fill: #9b1c1c;
+    -fx-font-size: 12px;
+}
+
+/* —— Shell / menú lateral —— */
+.side-menu {
+    -fx-background-color: #1f3a5f;
+}
+
+.side-brand {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.side-hint {
+    -fx-text-fill: #bcccdc;
+    -fx-font-size: 11px;
+}
+
+.side-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d9e2ec;
+    -fx-background-radius: 6;
+    -fx-padding: 10 12 10 12;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.side-item:hover {
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+.side-item-active {
+    -fx-background-color: rgba(255,255,255,0.16);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.side-logout {
+    -fx-background-color: #9b1c1c;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+}
+
+.side-logout:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.top-bar {
+    -fx-background-color: white;
+    -fx-padding: 10 16 10 16;
+    -fx-border-color: #e4eaf1;
+    -fx-border-width: 0 0 1 0;
+}
+
+.top-meta {
+    -fx-text-fill: #486581;
+    -fx-font-size: 12px;
+}
+
+.content-area {
+    -fx-background-color: #f5f7fa;
+}
+
+.signature-pad {
+    -fx-background-color: white;
+    -fx-border-color: #bcccdc;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+}
+
+.dialog-actions {
+    -fx-background-color: #eef2f6;
+    -fx-border-color: #d9e2ec;
+    -fx-border-width: 1 0 0 0;
+}
+
+.media-slot-photo {
+    -fx-background-color: #eef2f6;
+    -fx-border-color: #bcccdc;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-alignment: CENTER;
+    -fx-min-width: 160;
+    -fx-pref-width: 160;
+    -fx-max-width: 160;
+    -fx-min-height: 214;
+    -fx-pref-height: 214;
+    -fx-max-height: 214;
+}
+
+.media-slot-sign {
+    -fx-background-color: #eef2f6;
+    -fx-border-color: #bcccdc;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-alignment: CENTER;
+    -fx-min-width: 300;
+    -fx-pref-width: 300;
+    -fx-max-width: 300;
+    -fx-min-height: 100;
+    -fx-pref-height: 100;
+    -fx-max-height: 100;
+}

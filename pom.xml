@@ -19,50 +19,123 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21.0.2</javafx.version>
         <javafx.platform>linux</javafx.platform>
-        <!-- El empaquetado deja solo el nativo de este sistema. El otro se quita. -->
+        <!-- Shade: se excluye el nativo del otro sistema. -->
         <opencv.otro.sistema>nu/pattern/opencv/windows/**</opencv.otro.sistema>
         <serial.otro.sistema>Windows/**</serial.otro.sistema>
         <hid.otro.sistema>win32-*/**</hid.otro.sistema>
+        <jna.otro.sistema>com/sun/jna/win32-*/**</jna.otro.sistema>
+        <javafx.otro.classifier>win</javafx.otro.classifier>
+        <javafx.nativo.ajeno>**/*.dll</javafx.nativo.ajeno>
+        <!-- USB de Zebra: un solo nativo por plataforma (Maven Central). -->
+        <usb.nativo.classifier>linux-x86-64</usb.nativo.classifier>
+        <zebra.dir>${project.basedir}/lib/zebra</zebra.dir>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>mx.gob.sidi</groupId>
-            <artifactId>sidid</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/sidid.jar</systemPath>
-        </dependency>
-        <!-- Link-OS PC-Card 3.01.263. No está en Maven Central; Zebra lo publica suelto. -->
+        <!--
+          SDK Zebra propietario: system solo para compilar.
+          Se embebe en el JAR en prepare-package (shade no incluye scope system).
+        -->
         <dependency>
             <groupId>com.zebra</groupId>
             <artifactId>ZSDK_CARD_API</artifactId>
             <version>3.01.263</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/zebra/ZSDK_CARD_API.jar</systemPath>
+            <systemPath>${zebra.dir}/ZSDK_CARD_API.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.zebra</groupId>
             <artifactId>ZSDK_API</artifactId>
             <version>3.01.263</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/zebra/ZSDK_API.jar</systemPath>
+            <systemPath>${zebra.dir}/ZSDK_API.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.zebra</groupId>
+            <artifactId>barcode4j</artifactId>
+            <version>zebra</version>
+            <scope>system</scope>
+            <systemPath>${zebra.dir}/barcode4j.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.zebra</groupId>
+            <artifactId>snmp6_1z</artifactId>
+            <version>1</version>
+            <scope>system</scope>
+            <systemPath>${zebra.dir}/snmp6_1z.jar</systemPath>
+        </dependency>
+
+        <!-- Transitive del Class-Path Zebra 3.01.263 (Maven Central → sí van al shade). -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.86</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+            <version>2.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.snmp4j</groupId>
+            <artifactId>snmp4j</artifactId>
+            <version>3.8.2</version>
+        </dependency>
+
+        <!-- USB: jar Java + un solo nativo (usb4java trae todos los classifiers por defecto). -->
         <dependency>
             <groupId>org.usb4java</groupId>
             <artifactId>usb4java</artifactId>
             <version>1.3.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/zebra/usb4java-1.3.0.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.usb4java</groupId>
+                    <artifactId>libusb4java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.usb4java</groupId>
             <artifactId>libusb4java</artifactId>
             <version>1.3.0</version>
-            <classifier>linux-x86-64</classifier>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/zebra/libusb4java-1.3.0-linux-x86-64.jar</systemPath>
+            <classifier>${usb.nativo.classifier}</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
@@ -124,43 +197,24 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
+            <!-- Embebe SDK Zebra (system) dentro de classes para que el shade lo lleve al ejecutable. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>incluir-sidid</id>
+                        <id>embed-zebra-sdk</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <target>
-                                <unzip src="${project.basedir}/lib/sidid.jar" dest="${project.build.outputDirectory}" overwrite="true">
-                                    <patternset>
-                                        <!-- Cámara, pad, tema y el adaptador ZXP. El resto de sidid no lo usa la estación. -->
-                                        <include name="mx/gob/sidi/desk/devices/**"/>
-                                        <include name="mx/gob/sidi/desk/app/ui/CameraCaptureDialog*.class"/>
-                                        <include name="mx/gob/sidi/desk/app/ui/SignatureCaptureDialog*.class"/>
-                                        <include name="mx/gob/sidi/desk/app/ui/UiTheme.class"/>
-                                        <include name="mx/gob/sidi/desk/app/ui/UiDialogs.class"/>
-                                        <include name="ui/sididesk.css"/>
-                                        <include name="card-layout.properties"/>
-                                    </patternset>
-                                </unzip>
-                                <!-- Link-OS PC-Card Java 3.01.211. Licencia de Zebra en lib/zebra. -->
-                                <unzip dest="${project.build.outputDirectory}" overwrite="false">
-                                    <fileset dir="${project.basedir}/lib/zebra" includes="*.jar"/>
-                                    <patternset>
-                                        <exclude name="META-INF/MANIFEST.MF"/>
-                                        <exclude name="META-INF/*.SF"/>
-                                        <exclude name="META-INF/*.DSA"/>
-                                        <exclude name="META-INF/*.RSA"/>
-                                        <exclude name="META-INF/maven/**"/>
-                                        <exclude name="module-info.class"/>
-                                    </patternset>
-                                </unzip>
+                                <unzip dest="${project.build.outputDirectory}" overwrite="true" src="${zebra.dir}/ZSDK_CARD_API.jar"/>
+                                <unzip dest="${project.build.outputDirectory}" overwrite="true" src="${zebra.dir}/ZSDK_API.jar"/>
+                                <unzip dest="${project.build.outputDirectory}" overwrite="true" src="${zebra.dir}/barcode4j.jar"/>
+                                <unzip dest="${project.build.outputDirectory}" overwrite="true" src="${zebra.dir}/snmp6_1z.jar"/>
                             </target>
                         </configuration>
                     </execution>
@@ -178,6 +232,15 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!-- *:* fuerza incluir también las system (Zebra SDK + deps). -->
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>org.openjfx:*:*:${javafx.otro.classifier}</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -186,6 +249,12 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.openjfx:*</artifact>
+                                    <excludes>
+                                        <exclude>${javafx.nativo.ajeno}</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -228,6 +297,18 @@
                                         <exclude>${hid.otro.sistema}</exclude>
                                     </excludes>
                                 </filter>
+                                <filter>
+                                    <artifact>net.java.dev.jna:jna</artifact>
+                                    <excludes>
+                                        <exclude>com/sun/jna/darwin*/**</exclude>
+                                        <exclude>com/sun/jna/aix-*/**</exclude>
+                                        <exclude>com/sun/jna/freebsd-*/**</exclude>
+                                        <exclude>com/sun/jna/openbsd-*/**</exclude>
+                                        <exclude>com/sun/jna/sunos-*/**</exclude>
+                                        <exclude>com/sun/jna/dragonflybsd-*/**</exclude>
+                                        <exclude>${jna.otro.sistema}</exclude>
+                                    </excludes>
+                                </filter>
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -263,6 +344,10 @@
                 <opencv.otro.sistema>nu/pattern/opencv/linux/**</opencv.otro.sistema>
                 <serial.otro.sistema>Linux/**</serial.otro.sistema>
                 <hid.otro.sistema>linux-*/**</hid.otro.sistema>
+                <jna.otro.sistema>com/sun/jna/linux-*/**</jna.otro.sistema>
+                <javafx.otro.classifier>linux</javafx.otro.classifier>
+                <javafx.nativo.ajeno>**/*.so</javafx.nativo.ajeno>
+                <usb.nativo.classifier>win32-x86-64</usb.nativo.classifier>
             </properties>
         </profile>
         <profile>
@@ -273,6 +358,65 @@
             <properties>
                 <javafx.platform>mac</javafx.platform>
             </properties>
+        </profile>
+        <!--
+          Paquete liviano para la estación Windows (sin JRE embebido ni nativos de Linux).
+          Incluye SDK Zebra + DLL USB + bat.
+
+            mvn -Pwindows-dist -DskipTests clean package
+
+          Resultado: target/CredencialesSM-windows.zip
+        -->
+        <profile>
+            <id>windows-dist</id>
+            <properties>
+                <javafx.platform>win</javafx.platform>
+                <opencv.otro.sistema>nu/pattern/opencv/linux/**</opencv.otro.sistema>
+                <serial.otro.sistema>Linux/**</serial.otro.sistema>
+                <hid.otro.sistema>linux-*/**</hid.otro.sistema>
+                <jna.otro.sistema>com/sun/jna/linux-*/**</jna.otro.sistema>
+                <javafx.otro.classifier>linux</javafx.otro.classifier>
+                <javafx.nativo.ajeno>**/*.so</javafx.nativo.ajeno>
+                <usb.nativo.classifier>win32-x86-64</usb.nativo.classifier>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>zip-windows</id>
+                                <!-- Después del shade (también en package) para meter el JAR final. -->
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <mkdir dir="${project.build.directory}/CredencialesSM-windows/CredencialesSM"/>
+                                        <copy file="${project.build.directory}/${project.build.finalName}.jar"
+                                              tofile="${project.build.directory}/CredencialesSM-windows/CredencialesSM/credencialessm-1.0.0-SNAPSHOT.jar"/>
+                                        <copy file="${zebra.dir}/ZebraNativeUsbAdapter_64.dll"
+                                              todir="${project.build.directory}/CredencialesSM-windows/CredencialesSM"/>
+                                        <copy file="${zebra.dir}/ZebraNativeUsbAdapter_32.dll"
+                                              todir="${project.build.directory}/CredencialesSM-windows/CredencialesSM"/>
+                                        <echo file="${project.build.directory}/CredencialesSM-windows/CredencialesSM/CredencialesSM.bat"
+                                              encoding="UTF-8"><![CDATA[@echo off
+cd /d "%~dp0"
+java -Dfile.encoding=UTF-8 -Djava.library.path=%~dp0 -jar credencialessm-1.0.0-SNAPSHOT.jar
+if errorlevel 1 pause
+]]></echo>
+                                        <zip destfile="${project.build.directory}/CredencialesSM-windows.zip"
+                                             basedir="${project.build.directory}/CredencialesSM-windows"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

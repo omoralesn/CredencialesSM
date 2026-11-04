@@ -5,9 +5,7 @@ El error «faltan los componentes de JavaFX runtime» aparece si Eclipse lanza `
 ## Importar
 
 1. File → Import → Maven → Existing Maven Projects.
-2. Importar estas dos carpetas:
-   - `/home/ojmn/EspaciosTrabajo/Eclipse/sidid`
-   - `/home/ojmn/EspaciosTrabajo/Eclipse/CredencialesSM`
+2. Importar `/home/ojmn/EspaciosTrabajo/Eclipse/CredencialesSM`.
 3. Clic derecho en **credencialessm** → Maven → Update Project.
 4. El JDK del proyecto debe ser Java 21. En esta máquina: `/home/ojmn/programas/java/amazon-corretto-21.0.12.8.1-linux-x64`.
 5. En Eclipse (Window → Preferences → Java → Installed JREs) debe existir ese Corretto 21. Este Eclipse (4.24) no trae el entorno `JavaSE-21`; el launch `CredencialesSM.launch` apunta al JRE por nombre (`amazon-corretto-21.0.12.8.1-linux-x64`). Si aparece `install is null` al lanzar, es porque el run configuration sigue usando `JavaSE-21`: cámbialo a ese JRE concreto.

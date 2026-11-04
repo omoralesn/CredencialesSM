@@ -176,12 +176,19 @@
     </build>
 
     <profiles>
+        <!--
+          Paquete Windows: lib USB win + DLL Zebra + zip en target.
+
+            mvn -Pwindows -DskipTests clean package
+
+          Resultado: target/zxp-prueba-windows.zip
+        -->
         <profile>
             <id>windows</id>
             <properties>
                 <usb.nativo>libusb4java-1.3.0-win32-x86-64.jar</usb.nativo>
                 <usb.nativo.archivo>${settings.localRepository}/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-win32-x86-64.jar</usb.nativo.archivo>
-                <envio.dir>${project.build.directory}/envio-windows</envio.dir>
+                <envio.dir>${project.build.directory}/zxp-prueba-windows</envio.dir>
             </properties>
             <dependencies>
                 <dependency>
@@ -191,6 +198,31 @@
                     <classifier>win32-x86-64</classifier>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>zip-windows</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <zip destfile="${project.build.directory}/zxp-prueba-windows.zip"
+                                             basedir="${project.build.directory}"
+                                             includes="zxp-prueba-windows/**"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

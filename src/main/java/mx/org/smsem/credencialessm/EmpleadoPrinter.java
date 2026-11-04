@@ -1,8 +1,8 @@
 package mx.org.smsem.credencialessm;
 
-import mx.gob.sidi.desk.devices.CredentialPrintJob;
-import mx.gob.sidi.desk.devices.PrintResult;
-import mx.gob.sidi.desk.devices.ZxpSeries7Printer;
+import mx.org.smsem.credencialessm.dispositivos.CredentialPrintJob;
+import mx.org.smsem.credencialessm.dispositivos.PrintResult;
+import mx.org.smsem.credencialessm.dispositivos.ZxpSeries7Printer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,18 +43,10 @@ public final class EmpleadoPrinter {
         int yReverso = hoja.getHeight() - EmpleadoCardComposer.ALTO;
         BufferedImage reverso = hoja.getSubimage(0, yReverso, EmpleadoCardComposer.ANCHO, EmpleadoCardComposer.ALTO);
         ZxpSeries7Printer zxp = new ZxpSeries7Printer(dataDir);
-        CredentialPrintJob frenteJob = new CredentialPrintJob(
+        CredentialPrintJob trabajo = new CredentialPrintJob(
                 safe, safe, safe, "", empleado.clave, empleado.nombreCompleto, "",
                 "EMPLEADO", null, null);
-        PrintResult cara = zxp.printPreparedFace(frente, frenteJob);
-        CredentialPrintJob reversoJob = new CredentialPrintJob(
-                safe + "-R", safe, safe, "", empleado.clave, empleado.nombreCompleto, "",
-                "EMPLEADO", null, null);
-        PrintResult dorso = zxp.printPreparedFace(reverso, reversoJob);
-        if (!dorso.isAccepted()) {
-            return dorso;
-        }
-        return cara;
+        return zxp.printPreparedFaces(frente, reverso, trabajo);
     }
 
     /** True solo si va a impresora física (no checkbox archivo ni modo preview). */

@@ -1,7 +1,7 @@
 package mx.org.smsem.credencialessm;
 
-import mx.gob.sidi.desk.app.ui.UiTheme;
-import mx.gob.sidi.desk.devices.PrintResult;
+import mx.org.smsem.credencialessm.dispositivos.PrintResult;
+import mx.org.smsem.credencialessm.ui.UiTheme;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
