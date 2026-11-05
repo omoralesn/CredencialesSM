@@ -2,6 +2,8 @@ package mx.org.smsem.credencialessm.dispositivos;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
@@ -12,8 +14,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import mx.org.smsem.credencialessm.ConstantesEstacion;
 
 /**
  * Envía frente y reverso a la ZXP Series 7 por USB.
@@ -25,6 +30,10 @@ public final class ZxpSeries7Printer {
     private static final DateTimeFormatter FILE_TS = DateTimeFormatter
             .ofPattern("yyyyMMdd-HHmmss")
             .withZone(ZoneId.systemDefault());
+    /** Área útil de la ZXP Series 7 a 300 dpi. Más chico deja un marco blanco. */
+    private static final int ZXP7_ANCHO = 1006;
+    private static final int ZXP7_ALTO = 640;
+
     private static final String[] DLLS = {
             "ZebraNativeUsbAdapter_64.dll",
             "ZebraNativeUsbAdapter_32.dll"
@@ -38,7 +47,8 @@ public final class ZxpSeries7Printer {
 
     /**
      * Frente y, si viene, reverso, en un solo trabajo USB.
-     * Origen 0,0 y tamaño real de cada imagen (638×1012 vertical).
+     * La credencial se dibuja vertical (638×1012). La ZXP la acuesta si se manda así;
+     * con impresora.orientacion=vertical se gira para que salga de pie.
      */
     public PrintResult printPreparedFaces(BufferedImage frente, BufferedImage reverso, CredentialPrintJob job) {
         try {
@@ -115,12 +125,32 @@ public final class ZxpSeries7Printer {
             Object sinGiro = enumValor(rotacion, "RotateNoneFlipNone");
             Object bmp = enumValor(tipoDibujo, "BMP");
             Class<?> infoTipo = Class.forName("com.zebra.sdk.common.card.containers.GraphicsInfo");
+            boolean vertical = orientacionVertical();
             List<Object> trabajos = new ArrayList<>();
             for (Cara cara : caras) {
                 BufferedImage imagen = cara.imagen;
+                String nombreOrient;
+                boolean reverso = "Back".equals(cara.lado);
+                if (vertical) {
+                    // El frente va antihorario. El reverso, al voltear la tarjeta, queda al revés
+                    // si se gira igual: horario lo endereza.
+                    imagen = rotar90(imagen, reverso);
+                    nombreOrient = "Landscape";
+                    imagen = cubrir(imagen, ZXP7_ANCHO, ZXP7_ALTO);
+                } else {
+                    if (reverso) {
+                        imagen = rotar180(imagen);
+                    }
+                    nombreOrient = imagen.getHeight() >= imagen.getWidth() ? "Portrait" : "Landscape";
+                    imagen = "Portrait".equals(nombreOrient)
+                            ? cubrir(imagen, ZXP7_ALTO, ZXP7_ANCHO)
+                            : cubrir(imagen, ZXP7_ANCHO, ZXP7_ALTO);
+                }
                 int ancho = imagen.getWidth();
                 int alto = imagen.getHeight();
-                Object orient = enumValor(orientacion, alto >= ancho ? "Portrait" : "Landscape");
+                Object orient = enumValor(orientacion, nombreOrient);
+                LOG.info(() -> "ZXP7 " + (vertical ? "vertical" : "horizontal")
+                        + " " + ancho + "×" + alto + " " + nombreOrient);
                 tipoGrafico.getMethod("initialize", int.class, int.class, orientacion, tipoImpresion, Color.class)
                         .invoke(graficos, ancho, alto, orient, color, Color.WHITE);
                 byte[] pixeles = (byte[]) tipoGrafico.getMethod("imageToImageData", BufferedImage.class)
@@ -147,6 +177,79 @@ public final class ZxpSeries7Printer {
             cerrar(impresora, "destroy");
             cerrar(conexion, "close");
         }
+    }
+
+    /** vertical | horizontal, en constantes.properties. */
+    private static boolean orientacionVertical() {
+        String valor = ConstantesEstacion.texto("impresora.orientacion").toLowerCase(Locale.ROOT);
+        if ("vertical".equals(valor)) {
+            return true;
+        }
+        if ("horizontal".equals(valor)) {
+            return false;
+        }
+        throw new IllegalStateException(
+                "impresora.orientacion debe ser vertical u horizontal, no \"" + valor + "\"");
+    }
+
+    /** Llena el área útil recortando el centro, sin bandas blancas. */
+    private static BufferedImage cubrir(BufferedImage origen, int ancho, int alto) {
+        if (origen.getWidth() == ancho && origen.getHeight() == alto) {
+            return origen;
+        }
+        double escala = Math.max(ancho / (double) origen.getWidth(), alto / (double) origen.getHeight());
+        int w = Math.max(ancho, (int) Math.round(origen.getWidth() * escala));
+        int h = Math.max(alto, (int) Math.round(origen.getHeight() * escala));
+        int x = (ancho - w) / 2;
+        int y = (alto - h) / 2;
+        BufferedImage destino = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = destino.createGraphics();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g.drawImage(origen, x, y, w, h, null);
+        } finally {
+            g.dispose();
+        }
+        return destino;
+    }
+
+    private static BufferedImage rotar180(BufferedImage origen) {
+        int ancho = origen.getWidth();
+        int alto = origen.getHeight();
+        BufferedImage destino = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = destino.createGraphics();
+        try {
+            g.translate(ancho, alto);
+            g.rotate(Math.PI);
+            g.drawImage(origen, 0, 0, null);
+        } finally {
+            g.dispose();
+        }
+        return destino;
+    }
+
+    /**
+     * Gira 90°. En sentido antihorario el borde de arriba del diseño queda a la izquierda,
+     * y al imprimirlo en horizontal la ZXP lo deja vertical.
+     */
+    private static BufferedImage rotar90(BufferedImage origen, boolean horario) {
+        int ancho = origen.getWidth();
+        int alto = origen.getHeight();
+        BufferedImage destino = new BufferedImage(alto, ancho, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = destino.createGraphics();
+        try {
+            if (horario) {
+                g.translate(alto, 0);
+                g.rotate(Math.PI / 2);
+            } else {
+                g.translate(0, ancho);
+                g.rotate(-Math.PI / 2);
+            }
+            g.drawImage(origen, 0, 0, null);
+        } finally {
+            g.dispose();
+        }
+        return destino;
     }
 
     private static void cargarUsbNativo() {

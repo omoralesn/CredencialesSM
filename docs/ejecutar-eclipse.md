@@ -27,7 +27,7 @@ Después desconecta el pad 10 segundos y vuelve a conectarlo.
 
 La dirección del servidor, el token, el modo de impresora y el resto de valores de la estación están en `src/main/resources/credencialessm/constantes.properties`. Ahí se cambian una sola vez.
 
-`impresora.modo=preview` guarda un PNG de la credencial. En la estación Windows, con la Zebra, usar `zxp7`.
+`impresora.modo=preview` guarda un PNG de la credencial. En la estación Windows, con la Zebra, usar `zxp7`. `impresora.orientacion=vertical` deja la credencial de pie; `horizontal` la acuesta.
 
 SMSEM debe estar levantado contra la base de desarrollo y la tabla `TE_PERSONALSMSEM` creada con `CredencialesSM/sql/TE_PERSONALSMSEM.sql`.
 
