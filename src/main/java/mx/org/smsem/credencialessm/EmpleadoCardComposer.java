@@ -32,33 +32,35 @@ public final class EmpleadoCardComposer {
     static final int ALTO = 1012;
     private static final int SEPARACION = 24;
 
-    private static final int FOTO_X = 300;
-    private static final int FOTO_Y = 615;
-    private static final int FOTO_W = 443;
-    private static final int FOTO_H = 491;
+    /** Interior del marco de foto del boceto frente (638×1024). */
+    private static final int FOTO_X = 184;
+    private static final int FOTO_Y = 377;
+    private static final int FOTO_W = 270;
+    private static final int FOTO_H = 298;
 
-    /** Entre el marco de la foto y las letras PA. */
-    private static final int NOMBRE_X = 200;
-    private static final int NOMBRE_Y = 1154;
-    private static final int NOMBRE_W = 620;
-    private static final int NOMBRE_H = 142;
+    /** Entre la foto y la franja ADMINISTRATIVO. */
+    private static final int NOMBRE_X = 48;
+    private static final int NOMBRE_Y = 688;
+    private static final int NOMBRE_W = 542;
+    private static final int NOMBRE_H = 200;
 
-    /** Guinda de la adscripción. El nombre del empleado va en negro. */
-    private static final Color ADSCRIPCION_COLOR = new Color(0x7A, 0x22, 0x2C);
+    /** Adscripción en negro sobre el recuadro blanco del reverso. */
+    private static final Color ADSCRIPCION_COLOR = Color.BLACK;
 
-    /** Dentro de la franja blanca, a la derecha de la flecha azul. */
-    private static final int ADS_X = 190;
-    private static final int ADS_Y = 310;
-    private static final int ADS_W = 740;
-    private static final int ADS_H = 168;
+    /** Recuadro blanco bajo la etiqueta Adscripción. */
+    private static final int ADS_X = 56;
+    private static final int ADS_Y = 182;
+    private static final int ADS_W = 526;
+    private static final int ADS_H = 90;
 
-    private static final int FIRMA_X = 190;
-    private static final int FIRMA_Y = 512;
-    private static final int FIRMA_W = 720;
-    private static final int FIRMA_H = 208;
+    /** Firma del pad: entre el recuadro de adscripción y el texto “Firma del trabajador”. */
+    private static final int FIRMA_X = 110;
+    private static final int FIRMA_Y = 310;
+    private static final int FIRMA_W = 420;
+    private static final int FIRMA_H = 150;
 
-    private static final int QR_TAMANO = 400;
-    private static final int QR_Y = 1165;
+    private static final int QR_TAMANO = 220;
+    private static final int QR_Y = 770;
 
     public BufferedImage compose(EmpleadoSmsem empleado, byte[] foto, byte[] firma) throws Exception {
         BufferedImage frente = cara(empleado, foto, firma, true);
@@ -112,7 +114,7 @@ public final class EmpleadoCardComposer {
     }
 
     /**
-     * Nombre del empleado, entre la fotografía y el texto PA, en el azul del diseño.
+     * Nombre del empleado, entre la fotografía y la franja ADMINISTRATIVO.
      * Si no cabe en un renglón, sigue en las líneas que hagan falta.
      */
     private static void dibujarNombre(Graphics2D g, String nombre, Margen margen) {
@@ -125,16 +127,16 @@ public final class EmpleadoCardComposer {
         int w = medidaX(NOMBRE_W, margen);
         int h = medidaY(NOMBRE_H, margen);
         int ancho = Math.max(1, w - 12);
-        int tamano = 36;
+        int tamano = 44;
         g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, tamano));
         List<String> lineas = envolver(g.getFontMetrics(), texto, ancho);
         if (lineas.size() > 1) {
-            tamano = 32;
+            tamano = 38;
             g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, tamano));
             lineas = envolver(g.getFontMetrics(), texto, ancho);
         }
         FontMetrics medidas = g.getFontMetrics();
-        while (tamano > 20 && lineas.size() * medidas.getHeight() > h) {
+        while (tamano > 22 && lineas.size() * medidas.getHeight() > h) {
             tamano--;
             g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, tamano));
             medidas = g.getFontMetrics();
@@ -162,8 +164,9 @@ public final class EmpleadoCardComposer {
     }
 
     /**
-     * La adscripción cabe en varias líneas. Un nombre corto sigue en una sola,
-     * centrado; si no cabe, baja de tamaño solo hasta que el bloque quepa en la franja.
+     * La adscripción cabe en varias líneas dentro del recuadro blanco, en negro.
+     * Un texto corto sigue en una sola, centrado; si no cabe, baja de tamaño
+     * hasta que el bloque quepa en la franja.
      */
     private static void dibujarAdscripcion(Graphics2D g, String adscripcion, Margen margen) {
         String texto = adscripcion == null ? "" : adscripcion.trim().replaceAll("\\s+", " ");
@@ -174,20 +177,20 @@ public final class EmpleadoCardComposer {
         int y = escalaY(ADS_Y, margen);
         int w = medidaX(ADS_W, margen);
         int h = medidaY(ADS_H, margen);
-        int holgura = 6;
+        int holgura = 8;
         int ancho = Math.max(1, w - holgura * 2);
-        int tamano = 22;
+        int tamano = 20;
         Font fuente = new Font(Font.SANS_SERIF, Font.BOLD, tamano);
         g.setFont(fuente);
         List<String> lineas = envolver(g.getFontMetrics(), texto, ancho);
         if (lineas.size() > 1) {
-            tamano = 20;
+            tamano = 18;
             fuente = new Font(Font.SANS_SERIF, Font.BOLD, tamano);
             g.setFont(fuente);
             lineas = envolver(g.getFontMetrics(), texto, ancho);
         }
         FontMetrics medidas = g.getFontMetrics();
-        while (tamano > 13 && lineas.size() * medidas.getHeight() > h) {
+        while (tamano > 11 && lineas.size() * medidas.getHeight() > h) {
             tamano--;
             fuente = new Font(Font.SANS_SERIF, Font.BOLD, tamano);
             g.setFont(fuente);
@@ -407,7 +410,10 @@ public final class EmpleadoCardComposer {
         }
     }
 
-    /** Borde blanco del boceto, para que el diseño llegue al canto de la tarjeta. */
+    /**
+     * Recorta el marco del boceto (borde blanco o negro del mockup) para que el
+     * diseño llegue al canto de la tarjeta al imprimir.
+     */
     private static Margen margenBlanco(BufferedImage imagen) {
         int ancho = imagen.getWidth();
         int alto = imagen.getHeight();
@@ -415,51 +421,53 @@ public final class EmpleadoCardComposer {
         int abajo = alto - 1;
         int izquierda = 0;
         int derecha = ancho - 1;
-        while (arriba < abajo && filaBlanca(imagen, arriba)) {
+        while (arriba < abajo && filaMarco(imagen, arriba)) {
             arriba++;
         }
-        while (abajo > arriba && filaBlanca(imagen, abajo)) {
+        while (abajo > arriba && filaMarco(imagen, abajo)) {
             abajo--;
         }
-        while (izquierda < derecha && columnaBlanca(imagen, izquierda)) {
+        while (izquierda < derecha && columnaMarco(imagen, izquierda)) {
             izquierda++;
         }
-        while (derecha > izquierda && columnaBlanca(imagen, derecha)) {
+        while (derecha > izquierda && columnaMarco(imagen, derecha)) {
             derecha--;
         }
         return new Margen(izquierda, arriba, derecha - izquierda + 1, abajo - arriba + 1);
     }
 
-    private static boolean filaBlanca(BufferedImage imagen, int y) {
-        int blancos = 0;
+    private static boolean filaMarco(BufferedImage imagen, int y) {
+        int marco = 0;
         int ancho = imagen.getWidth();
         for (int x = 0; x < ancho; x++) {
-            if (esBlanco(imagen.getRGB(x, y))) {
-                blancos++;
+            if (esMarco(imagen.getRGB(x, y))) {
+                marco++;
             }
         }
-        return blancos >= ancho * 0.9;
+        return marco >= ancho * 0.85;
     }
 
-    private static boolean columnaBlanca(BufferedImage imagen, int x) {
-        int blancos = 0;
+    private static boolean columnaMarco(BufferedImage imagen, int x) {
+        int marco = 0;
         int alto = imagen.getHeight();
         for (int y = 0; y < alto; y++) {
-            if (esBlanco(imagen.getRGB(x, y))) {
-                blancos++;
+            if (esMarco(imagen.getRGB(x, y))) {
+                marco++;
             }
         }
-        return blancos >= alto * 0.9;
+        return marco >= alto * 0.85;
     }
 
-    private static boolean esBlanco(int rgb) {
+    /** Blanco de margen o negro del trazo del boceto. */
+    private static boolean esMarco(int rgb) {
         int rojo = (rgb >> 16) & 0xFF;
         int verde = (rgb >> 8) & 0xFF;
         int azul = rgb & 0xFF;
-        return rojo >= 248 && verde >= 248 && azul >= 248;
+        return (rojo >= 248 && verde >= 248 && azul >= 248)
+                || (rojo <= 40 && verde <= 40 && azul <= 40);
     }
 
-    /** Posición del boceto, ya sin el borde blanco. */
+    /** Posición del boceto, ya sin el marco exterior. */
     private static int escalaX(int valor, Margen margen) {
         return (valor - margen.x) * ANCHO / margen.ancho;
     }
